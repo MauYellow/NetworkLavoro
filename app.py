@@ -59,8 +59,6 @@ def messaggio_telegram(result, channel_id, immagine):
    except Exception as e:
       print(f"Errore ricezione dettagli ad: {e}")
 
-
-
 def trova_offerta(channel_id, Adzuna_Tag, channel_name):
   channel_id = f'{channel_id}'
   print(f"Cerco offerta per {channel_name}")
@@ -112,7 +110,6 @@ def schedula_annuncio_mensile():
     except Exception as e:
       print(f"Errore invio messaggio su telegram: {e}")
 
-
 def start_bot():
    print("Start..")
    time.sleep(5)
@@ -127,10 +124,10 @@ def start_bot():
 #start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
-schedule.every().day.at("08:00:00").do(start_bot)
-schedule.every().day.at("12:00:00").do(start_bot)
-schedule.every().day.at("18:00:00").do(start_bot)
-schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
+#schedule.every().day.at("08:00:00").do(start_bot)
+#schedule.every().day.at("12:00:00").do(start_bot)
+#schedule.every().day.at("18:00:00").do(start_bot)
+#schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
 
 # === QUART APP ===
 app = Quart(__name__)
@@ -139,7 +136,7 @@ app = Quart(__name__)
 telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
 # Inizializza il bot
 #telegram_app.add_handler(CallbackQueryHandler(button_handler))
-telegram_app.add_handler(CommandHandler("start", start_bot))
+#telegram_app.add_handler(CommandHandler("start", start_bot))
 #telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
 
 async def start(update: Update, context: CallbackContext):
@@ -167,14 +164,14 @@ async def webhook():
 async def scheduler_loop():
     while True:
         schedule.run_pending()
-        await asyncio.sleep(30)
+        await asyncio.sleep(10)
         print("Waiting for action..")
 
 # === AVVIO APP ===
 if __name__ == "__main__":
     async def main():
         await telegram_app.initialize()
-        await telegram_app.start()
+        #await telegram_app.start()
         await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
         print(f"✅ Webhook impostato su: {TELEGRAM_WEBHOOK}")
         asyncio.create_task(scheduler_loop())
