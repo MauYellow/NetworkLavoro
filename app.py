@@ -4,6 +4,7 @@ from pyairtable import Table, Api
 from pyairtable.formulas import match
 import requests
 import random
+import asyncio
 import time
 import schedule, time
 from datetime import datetime, timezone
@@ -17,8 +18,7 @@ AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID")
 ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY")
 TELEGRAM_BOT_KEY = os.getenv("TELEGRAM_BOT_KEY")
-#print(AIRTABLE_API_KEY)
-#print(AIRTABLE_BASE_ID)
+TELEGRAM_WEBHOOK = os.getenv("TELEGRAM_WEBHOOK")
 
 def messaggio_telegram(result, channel_id, immagine):
    print("✅ Pubblicazione Offerta in corso..")
@@ -124,7 +124,7 @@ def start():
       trova_offerta(record['fields']['Channel_ID'], record['fields']['Adzuna_Tag'], record['fields']['Nome'])
       time.sleep(2)
 
-start()
+#start()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
 schedule.every().day.at("08:00:00").do(start)
@@ -135,11 +135,50 @@ schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
 # === QUART APP ===
 app = Quart(__name__)
 
+# === TELEGRAM APP ===
+telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
+# Inizializza il bot
+#telegram_app.add_handler(CallbackQueryHandler(button_handler))
+telegram_app.add_handler(CommandHandler("start", start))
+#telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
+
+async def start(update: Update, context: CallbackContext):
+    chat_type = update.effective_chat.type
+    print(">> Ricevuto /start da %s", update.effective_user.username)
+    if chat_type != "private":
+      await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
+      return
+
 @app.route("/")
 async def home():
-    offerte = trova_offerta()
-    return {"offerte": offerte}
+  return "ok"
+
+@app.route("/webhook", methods=["POST"])
+async def webhook():
+    try:
+        data = await request.get_json()
+        update = Update.de_json(data, telegram_app.bot)
+        await telegram_app.process_update(update)
+        return "OK", 200
+    except Exception:
+        print("Errore nel webhook:")
+        return "Errore interno", 500
+
+async def scheduler_loop():
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(30)
+        print("Waiting for action..")
 
 # === AVVIO APP ===
 if __name__ == "__main__":
-    app.run()
+    async def main():
+        await telegram_app.initialize()
+        await telegram_app.start()
+        await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
+        print(f"✅ Webhook impostato su: {TELEGRAM_WEBHOOK}")
+        asyncio.create_task(scheduler_loop())
+        port = int(os.environ.get("PORT", 8000))
+        await app.run_task(host="0.0.0.0", port=port)
+
+    asyncio.run(main())
