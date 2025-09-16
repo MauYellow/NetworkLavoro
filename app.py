@@ -16,9 +16,7 @@ AIRTABLE_API_KEY = os.getenv("AIRTABLE_API_KEY")
 AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID")
 ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY")
-AIRTABLE_URL = os.getenv("AIRTABLE_URL")
 TELEGRAM_BOT_KEY = os.getenv("TELEGRAM_BOT_KEY")
-HEADERS = {"Authorization": f"Bearer {AIRTABLE_API_KEY}"}
 
 def messaggio_telegram(result, channel_id, immagine):
    print("✅ Pubblicazione Offerta in corso..")
@@ -115,6 +113,7 @@ def schedula_annuncio_mensile():
 
 def start():
    print("Start..")
+   time.sleep(5)
    api = Api(AIRTABLE_API_KEY)
    TABLE_NAME = "Canali"
    table = api.table(AIRTABLE_BASE_ID, TABLE_NAME)
