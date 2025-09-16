@@ -146,9 +146,9 @@ async def start(update: Update, context: CallbackContext):
       await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
       return
 
-@app.route("/")
+@app.route("/", methods=["GET","POST"])
 async def home():
-  return "ok"
+    return "ok"
 
 @app.route("/webhook", methods=["POST"])
 async def webhook():
@@ -167,15 +167,9 @@ async def scheduler_loop():
         await asyncio.sleep(10)
         print("Waiting for action..")
 
-# === AVVIO APP ===
-if __name__ == "__main__":
-    async def main():
-        await telegram_app.initialize()
-        #await telegram_app.start()
-        await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
-        print(f"✅ Webhook impostato su: {TELEGRAM_WEBHOOK}")
-        asyncio.create_task(scheduler_loop())
-        port = int(os.environ.get("PORT", 8000))
-        await app.run_task(host="0.0.0.0", port=port)
+@app.before_serving
+async def startup():
+    await telegram_app.initialize()
+    await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
+    asyncio.create_task(scheduler_loop())
 
-    asyncio.run(main())
