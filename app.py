@@ -17,8 +17,8 @@ AIRTABLE_BASE_ID = os.getenv("AIRTABLE_BASE_ID")
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID")
 ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY")
 TELEGRAM_BOT_KEY = os.getenv("TELEGRAM_BOT_KEY")
-print(AIRTABLE_API_KEY)
-print(AIRTABLE_BASE_ID)
+#print(AIRTABLE_API_KEY)
+#print(AIRTABLE_BASE_ID)
 
 def messaggio_telegram(result, channel_id, immagine):
    print("✅ Pubblicazione Offerta in corso..")
