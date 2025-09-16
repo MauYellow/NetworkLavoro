@@ -127,9 +127,9 @@ def start_bot():
 #start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
-schedule.every().day.at("08:00:00").do(start)
-schedule.every().day.at("12:00:00").do(start)
-schedule.every().day.at("18:00:00").do(start)
+schedule.every().day.at("08:00:00").do(start_bot)
+schedule.every().day.at("12:00:00").do(start_bot)
+schedule.every().day.at("18:00:00").do(start_bot)
 schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
 
 # === QUART APP ===
@@ -139,7 +139,7 @@ app = Quart(__name__)
 telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
 # Inizializza il bot
 #telegram_app.add_handler(CallbackQueryHandler(button_handler))
-telegram_app.add_handler(CommandHandler("start", start))
+telegram_app.add_handler(CommandHandler("start", start_bot))
 #telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
 
 async def start(update: Update, context: CallbackContext):
