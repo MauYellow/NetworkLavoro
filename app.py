@@ -113,7 +113,7 @@ def schedula_annuncio_mensile():
       print(f"Errore invio messaggio su telegram: {e}")
 
 
-def start():
+def start_bot():
    print("Start..")
    time.sleep(5)
    api = Api(AIRTABLE_API_KEY)
@@ -124,7 +124,7 @@ def start():
       trova_offerta(record['fields']['Channel_ID'], record['fields']['Adzuna_Tag'], record['fields']['Nome'])
       time.sleep(2)
 
-#start()
+#start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
 schedule.every().day.at("08:00:00").do(start)
