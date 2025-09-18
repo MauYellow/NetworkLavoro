@@ -166,6 +166,7 @@ async def webhook():
         data = await request.get_json()
         print("Webhook data:", data)   
         update = Update.de_json(data, telegram_app.bot)
+        print("Webhook update:", update) 
         await telegram_app.process_update(update)
         return "OK", 200
     except Exception as e:
