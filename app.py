@@ -131,11 +131,11 @@ def start_bot():
       trova_offerta(record['fields']['Channel_ID'], record['fields']['Adzuna_Tag'], record['fields']['Nome'])
       time.sleep(2)
 
-time.sleep(20)
-start_bot()
+#time.sleep(20)
+#start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
-schedule.every().day.at("17:47:00").do(start_bot)
+schedule.every().day.at("18:30:00").do(start_bot)
 #schedule.every().day.at("12:00:00").do(start_bot)
 #schedule.every().day.at("18:00:00").do(start_bot)
 #schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
