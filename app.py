@@ -172,21 +172,9 @@ async def webhook():
         print(f"Errore nel webhook: {e}")
         return "Errore interno", 500
 
-# === AVVIO APP ===
-if __name__ == "__main__":
-    async def main():
-        await telegram_app.initialize()
-        await telegram_app.start()
-        await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
-        asyncio.create_task(scheduler_loop())
-
-        port = int(os.environ.get("PORT", 8000))
-        await app.run_task(host="0.0.0.0", port=port)
-
-    asyncio.run(main())
-#@app.before_serving
-#async def startup():
-#    await telegram_app.initialize()
-#    await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
-#    asyncio.create_task(scheduler_loop())
+@app.before_serving
+async def startup():
+    await telegram_app.initialize()
+    await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
+    asyncio.create_task(scheduler_loop())
 
