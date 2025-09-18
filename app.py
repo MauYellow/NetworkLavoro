@@ -127,7 +127,7 @@ def start_bot():
 #start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
-#schedule.every().day.at("08:00:00").do(start_bot)
+schedule.every().day.at("17:47:00").do(start_bot)
 #schedule.every().day.at("12:00:00").do(start_bot)
 #schedule.every().day.at("18:00:00").do(start_bot)
 #schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
