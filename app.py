@@ -131,6 +131,7 @@ def start_bot():
       trova_offerta(record['fields']['Channel_ID'], record['fields']['Adzuna_Tag'], record['fields']['Nome'])
       time.sleep(2)
 
+time.sleep(20)
 start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
