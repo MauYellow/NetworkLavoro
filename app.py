@@ -48,7 +48,7 @@ def messaggio_telegram(result, channel_id, immagine):
         "inline_keyboard": [[
             {
                 "text": "Candidati Ora",
-                "url": f"https://t.me/NetworkLavoro_Bot?start={result['id']}"
+                "url": f"https://t.me/NetworkLavoro_Bot?start={result['redirect_url']}"
             }
         ],
         [
@@ -148,11 +148,12 @@ async def start(update: Update, context: CallbackContext):
     payload = context.args[0] if context.args else None
     if payload:
       keyboard = [
-            [InlineKeyboardButton("Candidati Ora", url="https://www.google.com")]
+            [InlineKeyboardButton("Candidati Ora", url=f"{payload}")]
         ]
       reply_markup = InlineKeyboardMarkup(keyboard)
       await update.message.reply_text(
-            f"Ecco il link per candidarti all'offerta {payload}",
+            f"""Ecco il link per candidarti all'offerta.
+Ricorda, ti potrebbe essere chiesto di registrarti al portale.""",
             reply_markup=reply_markup
         )
     else:
