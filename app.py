@@ -136,7 +136,7 @@ app = Quart(__name__)
 telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
 # Inizializza il bot
 #telegram_app.add_handler(CallbackQueryHandler(button_handler))
-#telegram_app.add_handler(CommandHandler("start", start_bot))
+telegram_app.add_handler(CommandHandler("start", start_bot))
 #telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
 
 async def start(update: Update, context: CallbackContext):
