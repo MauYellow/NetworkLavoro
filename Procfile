@@ -1,1 +1,1 @@
-web: gunicorn -k quart.worker.GunicornWorker app:app
+worker: python app.py
