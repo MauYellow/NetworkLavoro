@@ -20,6 +20,9 @@ ADZUNA_API_KEY = os.getenv("ADZUNA_API_KEY")
 TELEGRAM_BOT_KEY = os.getenv("TELEGRAM_BOT_KEY")
 TELEGRAM_WEBHOOK = os.getenv("TELEGRAM_WEBHOOK")
 
+# === QUART APP ===
+app = Quart(__name__)
+
 def messaggio_telegram(result, channel_id, immagine):
    print("✅ Pubblicazione Offerta in corso..")
    print(immagine)
@@ -129,15 +132,9 @@ print("🕐 Server", datetime.now(timezone.utc).isoformat())
 #schedule.every().day.at("18:00:00").do(start_bot)
 #schedule.every().day.at("13:00").do(schedula_annuncio_mensile)
 
-# === QUART APP ===
-app = Quart(__name__)
-
 # === TELEGRAM APP ===
 telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
-# Inizializza il bot
-#telegram_app.add_handler(CallbackQueryHandler(button_handler))
-telegram_app.add_handler(CommandHandler("start", start_bot))
-#telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
+
 
 async def start(update: Update, context: CallbackContext):
     chat_type = update.effective_chat.type
@@ -145,6 +142,19 @@ async def start(update: Update, context: CallbackContext):
     if chat_type != "private":
       await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
       return
+
+
+async def scheduler_loop():
+    while True:
+        schedule.run_pending()
+        await asyncio.sleep(10)
+        print("Waiting for action..")
+
+
+# Inizializza il bot
+#telegram_app.add_handler(CallbackQueryHandler(button_handler))
+telegram_app.add_handler(CommandHandler("start", start_bot))
+#telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
 
 @app.route("/", methods=["GET","POST"])
 async def home():
@@ -161,15 +171,21 @@ async def webhook():
         print("Errore nel webhook:")
         return "Errore interno", 500
 
-async def scheduler_loop():
-    while True:
-        schedule.run_pending()
-        await asyncio.sleep(10)
-        print("Waiting for action..")
+# === AVVIO APP ===
+if __name__ == "__main__":
+    async def main():
+        await telegram_app.initialize()
+        await telegram_app.start()
+        await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
+        asyncio.create_task(scheduler_loop())
 
-@app.before_serving
-async def startup():
-    await telegram_app.initialize()
-    await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
-    asyncio.create_task(scheduler_loop())
+        port = int(os.environ.get("PORT", 8000))
+        await app.run_task(host="0.0.0.0", port=port)
+
+    asyncio.run(main())
+#@app.before_serving
+#async def startup():
+#    await telegram_app.initialize()
+#    await telegram_app.bot.set_webhook(TELEGRAM_WEBHOOK)
+#    asyncio.create_task(scheduler_loop())
 
