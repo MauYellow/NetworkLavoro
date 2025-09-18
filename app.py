@@ -168,8 +168,8 @@ async def webhook():
         update = Update.de_json(data, telegram_app.bot)
         await telegram_app.process_update(update)
         return "OK", 200
-    except Exception:
-        print("Errore nel webhook:")
+    except Exception as e:
+        print(f"Errore nel webhook: {e}")
         return "Errore interno", 500
 
 # === AVVIO APP ===
