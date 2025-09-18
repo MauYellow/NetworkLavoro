@@ -48,9 +48,16 @@ def messaggio_telegram(result, channel_id, immagine):
         "inline_keyboard": [[
             {
                 "text": "Candidati Ora",
-                "url": result['redirect_url']
+                "url": f"https://t.me/NetworkLavoro_Bot?start={result['id']}"
             }
-        ]]
+        ],
+        [
+           {
+                "text": "Altre offerte",
+                "url": 'https://t.me/-1002942608093'
+            }
+        ]
+        ]
     }
 }
       try:
@@ -69,7 +76,7 @@ def trova_offerta(channel_id, Adzuna_Tag, channel_name):
   try :
     response = requests.get(url_adzuna).json()
     result = response['results'][0]
-    #print(result)
+    print(f"Offerta trovata: {result}")
     api = Api(AIRTABLE_API_KEY)
     TABLE_NAME = "Offerte"
     table = api.table(AIRTABLE_BASE_ID, TABLE_NAME)
@@ -124,7 +131,7 @@ def start_bot():
       trova_offerta(record['fields']['Channel_ID'], record['fields']['Adzuna_Tag'], record['fields']['Nome'])
       time.sleep(2)
 
-#start_bot()
+start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
 schedule.every().day.at("17:47:00").do(start_bot)
@@ -137,11 +144,22 @@ telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
 
 
 async def start(update: Update, context: CallbackContext):
-    chat_type = update.effective_chat.type
-    print(">> Ricevuto /start da %s", update.effective_user.username)
-    if chat_type != "private":
-      await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
-      return
+    payload = context.args[0] if context.args else None
+    if payload:
+      keyboard = [
+            [InlineKeyboardButton("Candidati Ora", url="https://www.google.com")]
+        ]
+      reply_markup = InlineKeyboardMarkup(keyboard)
+      await update.message.reply_text(
+            f"Ecco il link per candidarti all'offerta {payload}",
+            reply_markup=reply_markup
+        )
+    else:
+      chat_type = update.effective_chat.type
+      print(">> Ricevuto /start da %s", update.effective_user.username)
+      if chat_type != "private":
+        await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
+        return
 
 
 async def scheduler_loop():
