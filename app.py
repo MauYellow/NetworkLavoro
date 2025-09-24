@@ -170,6 +170,83 @@ Ricorda, ti potrebbe essere chiesto di registrarti al portale.""",
         await update.message.reply_text("❌ Questo comando funziona solo in chat privata. Scrivimi qui 👉 ")
         return
 
+async def button_handler(update: Update, context: CallbackContext):
+    query = update.callback_query
+    user_id = query.from_user.id
+    username = query.from_user.username or "Senza username"
+    record_id = query.data
+    print(f"📌 Record ID ricevuto: {record_id}")
+
+    #airtable_url = f"https://api.airtable.com/v0/app371e6RlBMnvOa0/Bartender_Annunci/{record_id}"
+    try:
+        #response = requests.get(airtable_url, headers=HEADERS).json()
+        #fields = response.get("fields", {})
+
+        # Notifica all’admin
+        message = f"👤 {username} (ID: {user_id})"
+        await context.bot.send_message('975722590', message)
+
+
+        # Verifica iscrizione
+        if await check_subscription(user_id, context):
+            # Invia bottone per candidarsi
+            keyboard = [[InlineKeyboardButton("✅ Apply now!", url='www.google.com')]] #**
+            await query.message.reply_text(
+                f"✅ Puoi candidarti per l'offerta",
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        else:
+            # Verifica stato iscrizione per entrambi i canali
+          is_amazon = False
+          is_bartender = False
+
+          try:
+            member_amazon = await context.bot.get_chat_member(user_id, user_id)
+            is_amazon = member_amazon.status in [ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
+          except:
+            pass
+
+          try:
+            member_network = await context.bot.get_chat_member(user_id, user_id)
+            is_bartender = member_network.status in [ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
+          except:
+            pass
+
+# Crea simbolo accanto al nome
+          status_amazon = "✅" if is_amazon else "👉"
+          status_bartender = "✅" if is_bartender else "👉"
+
+# Messaggio di richiesta iscrizione
+          await query.message.reply_text(
+            """🇮🇹 Per procedere unisciti a questi canali:""",
+            parse_mode="Markdown",
+            disable_web_page_preview=True,
+            reply_markup=InlineKeyboardMarkup([
+    [InlineKeyboardButton(f"{status_amazon} Join Amazon Group -70%", url="https://t.me/amazon_hunter_italia")],
+    [InlineKeyboardButton(f"{status_bartender} Join Bartender Group", url="https://t.me/The_Bartender_Group")],
+    [InlineKeyboardButton("✉️ Continue", callback_data=record_id)]
+    ]))
+
+    except Exception as e:
+        print(f"❌ Errore nel recupero o aggiornamento Airtable: {e}")
+        await query.message.reply_text("❌ Si è verificato un errore. Riprova più tardi.")
+
+    await query.answer()
+
+
+async def check_subscription(user_id: int, context: CallbackContext) -> bool:
+    try:
+        member_amazon = await context.bot.get_chat_member(user_id, user_id)
+        member_network = await context.bot.get_chat_member(user_id, user_id)
+
+        is_amazon = member_amazon.status in [ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
+        is_network = member_network.status in [ChatMember.MEMBER, ChatMember.OWNER, ChatMember.ADMINISTRATOR]
+
+        return is_amazon and is_network
+
+    except Exception as e:
+        print(f"⚠️ Errore controllo iscrizione: {e}")
+        return False
 
 async def scheduler_loop():
     while True:
@@ -179,7 +256,7 @@ async def scheduler_loop():
 
 
 # Inizializza il bot
-#telegram_app.add_handler(CallbackQueryHandler(button_handler))
+telegram_app.add_handler(CallbackQueryHandler(button_handler))
 telegram_app.add_handler(CommandHandler("start", start))
 #telegram_app.add_handler(CommandHandler("chatid", log_chat_id))
 
