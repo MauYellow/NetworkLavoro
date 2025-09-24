@@ -87,9 +87,15 @@ def trova_offerta(channel_id, Adzuna_Tag, channel_name):
       else:
         immagine = random.choice(["https://i.postimg.cc/59w4NPPL/Vlog-Titolo-Thumbnail-You-Tube.png", "https://i.postimg.cc/nhLp2nnG/Vlog-Titolo-Thumbnail-You-Tube-2.png", "https://i.postimg.cc/GhdcBkNN/Vlog-Titolo-Thumbnail-You-Tube-1.png"])
         try:
-          new_record = table.create({"title": f"{result['title']}", "latitude": f"{result['latitude']}", "longitude": f"{result['longitude']}", "company": f"{result['company']['display_name']}", "adzuna_id": f"{result['id']}", "location": f"{result['location']['display_name']}", "description": f"{result['description']}", "redirect_url": f"{result['redirect_url']}", "immagine": immagine})
+          new_record = table.create({
+            "title": f"{result['title']}",
+            "latitude": str(result.get("latitude", "None")),
+            "longitude": str(result.get("longitude", "None")),
+            "company": f"{result['company']['display_name']}",
+            "adzuna_id": f"{result['id']}", "location": f"{result['location']['display_name']}", "description": f"{result['description']}", "redirect_url": f"{result['redirect_url']}", "immagine": immagine})
           print("✅ Nuovo record creato:", new_record)
           messaggio_telegram(result, channel_id, immagine)
+          time.sleep(5)
         except Exception as e:
           print(f"Errore in creazione row nel database: {e}")
     except Exception as e:
@@ -132,7 +138,7 @@ def start_bot():
       time.sleep(2)
 
 #time.sleep(20)
-#start_bot()
+start_bot()
 
 print("🕐 Server", datetime.now(timezone.utc).isoformat())
 schedule.every().day.at("18:40:00").do(start_bot)
@@ -147,6 +153,7 @@ telegram_app = Application.builder().token(TELEGRAM_BOT_KEY).build()
 async def start(update: Update, context: CallbackContext):
     payload = context.args[0] if context.args else None
     if payload:
+      print(f"Payload: {payload}")
       keyboard = [
             [InlineKeyboardButton("Candidati Ora", url=f"{payload}")]
         ]
