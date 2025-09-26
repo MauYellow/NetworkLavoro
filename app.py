@@ -48,13 +48,13 @@ def messaggio_telegram(result, channel_id, immagine):
         "inline_keyboard": [[
             {
                 "text": "Candidati Ora",
-                "url": f"https://t.me/NetworkLavoro_Bot?start={result['redirect_url']}"
+                "url": f"{result['redirect_url']}"
             }
         ],
         [
            {
                 "text": "Altre offerte",
-                "url": 'https://t.me/-1002942608093'
+                "url": 'https://t.me/annunci_lavoro_cerco'
             }
         ]
         ]
