@@ -82,7 +82,7 @@ def trova_offerta(channel_id, Adzuna_Tag, channel_name):
     table = api.table(AIRTABLE_BASE_ID, TABLE_NAME)
     try:
       adzuna_id_check = table.all(formula=f"{{adzuna_id}}='{response['results'][0]['id']}'")
-      if adzuna_id_check == 1:#**
+      if adzuna_id_check:
         print(f"⚠️ ID ({response['results'][0]['id']}) già presente")
       else:
         immagine = random.choice(["https://i.postimg.cc/59w4NPPL/Vlog-Titolo-Thumbnail-You-Tube.png", "https://i.postimg.cc/nhLp2nnG/Vlog-Titolo-Thumbnail-You-Tube-2.png", "https://i.postimg.cc/GhdcBkNN/Vlog-Titolo-Thumbnail-You-Tube-1.png"])
@@ -104,7 +104,7 @@ def trova_offerta(channel_id, Adzuna_Tag, channel_name):
     print(f"Errore in Cerco Offerta: {e}")
 
 def schedula_annuncio_mensile():
-  #prendere dati da airtable per canali, for each messaggio telegram**
+  #prendere dati da airtable per canali, for each messaggio telegram per pubblicità**
   if datetime.now(timezone.utc).day == 1:
     headers= {"content-type": "application/json"}
     data = {
